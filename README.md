@@ -232,7 +232,7 @@ The `deployment_params.json` file contains the deployment configuration for this
   "github_url": "https://github.com/Traia-IO/polymarket-v1-mcp-server",
   "mcp_server": {
     "name": "polymarket-v1-mcp",
-    "description": "Polymarket mcp v1",
+    "description": "Polymarket mcp server",
     "server_type": "streamable-http",
 "requires_api_key": true,
     "api_key_header": "Authorization",

@@ -97,137 +97,7 @@ logger.info(f"✅ FastMCP server created")
 @mcp.tool()
 @require_payment_for_tool(
     price=TokenAmount(
-        amount="10000",  # 0.01 tokens
-        asset=TokenAsset(
-            address="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-            decimals=6,
-            network="sepolia",
-            eip712=EIP712Domain(
-                name="IATPWallet",
-                version="1"
-            )
-        )
-    ),
-    description=""
-
-)
-async def health_check(
-    context: Context
-) -> Any:
-    """
-    GET /health
-
-    Generated from OpenAPI endpoint: GET /health
-
-    Args:
-        context: MCP context (auto-injected by framework, not user-provided)
-
-
-    Returns:
-        API response (dict, list, or other JSON type)
-
-    Example Usage:
-        await health_check()
-
-        Note: 'context' parameter is auto-injected by MCP framework
-    """
-    # Payment already verified by @require_payment_for_tool decorator
-    # Get API key using helper (handles request.state fallback)
-    api_key = get_active_api_key(context)
-
-    try:
-        url = f"https://pma.d402.net/health"
-        params = {}
-        headers = {}
-        if api_key:
-            headers["X-API-Key"] = api_key
-            # Also send Bearer for robustness (most APIs use Bearer)
-            headers["Authorization"] = f"Bearer {api_key}"
-
-        response = requests.get(
-            url,
-            params=params,
-            headers=headers,
-            timeout=30
-        )
-        response.raise_for_status()
-
-        return response.json()
-
-    except Exception as e:
-        logger.error(f"Error in health_check: {e}")
-        return {"error": str(e), "endpoint": "/health"}
-
-
-@mcp.tool()
-@require_payment_for_tool(
-    price=TokenAmount(
-        amount="10000",  # 0.01 tokens
-        asset=TokenAsset(
-            address="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-            decimals=6,
-            network="sepolia",
-            eip712=EIP712Domain(
-                name="IATPWallet",
-                version="1"
-            )
-        )
-    ),
-    description=""
-
-)
-async def api_status(
-    context: Context
-) -> Any:
-    """
-    GET /api/status
-
-    Generated from OpenAPI endpoint: GET /api/status
-
-    Args:
-        context: MCP context (auto-injected by framework, not user-provided)
-
-
-    Returns:
-        API response (dict, list, or other JSON type)
-
-    Example Usage:
-        await api_status()
-
-        Note: 'context' parameter is auto-injected by MCP framework
-    """
-    # Payment already verified by @require_payment_for_tool decorator
-    # Get API key using helper (handles request.state fallback)
-    api_key = get_active_api_key(context)
-
-    try:
-        url = f"https://pma.d402.net/api/status"
-        params = {}
-        headers = {}
-        if api_key:
-            headers["X-API-Key"] = api_key
-            # Also send Bearer for robustness (most APIs use Bearer)
-            headers["Authorization"] = f"Bearer {api_key}"
-
-        response = requests.get(
-            url,
-            params=params,
-            headers=headers,
-            timeout=30
-        )
-        response.raise_for_status()
-
-        return response.json()
-
-    except Exception as e:
-        logger.error(f"Error in api_status: {e}")
-        return {"error": str(e), "endpoint": "/api/status"}
-
-
-@mcp.tool()
-@require_payment_for_tool(
-    price=TokenAmount(
-        amount="50000",  # 0.05 tokens
+        amount="100000",  # 0.1 tokens
         asset=TokenAsset(
             address="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             decimals=6,
@@ -243,7 +113,7 @@ async def api_status(
 )
 async def get_latest_sentiment_tick_or_rollup(
     context: Context,
-    asset: Optional[str] = None,
+    asset: str,
     period: str = "15m"
 ) -> Any:
     """
@@ -299,7 +169,7 @@ async def get_latest_sentiment_tick_or_rollup(
 @mcp.tool()
 @require_payment_for_tool(
     price=TokenAmount(
-        amount="50000",  # 0.05 tokens
+        amount="100000",  # 0.1 tokens
         asset=TokenAsset(
             address="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             decimals=6,
@@ -315,7 +185,7 @@ async def get_latest_sentiment_tick_or_rollup(
 )
 async def get_sentiment_history(
     context: Context,
-    asset: Optional[str] = None,
+    asset: str,
     period: str = "15m",
     limit: int = 48
 ) -> Any:
@@ -374,7 +244,7 @@ async def get_sentiment_history(
 @mcp.tool()
 @require_payment_for_tool(
     price=TokenAmount(
-        amount="50000",  # 0.05 tokens
+        amount="100000",  # 0.1 tokens
         asset=TokenAsset(
             address="0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
             decimals=6,
@@ -385,27 +255,29 @@ async def get_sentiment_history(
             )
         )
     ),
-    description="Returns the most recent raw market data snapshot u"
+    description="Returns the most recent pre-computed prediction ti"
 
 )
-async def get_latest_market_snapshot(
+async def get_latest_prediction_tick(
     context: Context,
-    asset: Optional[str] = None
+    asset: str,
+    timeframe: str
 ) -> Any:
     """
-    Returns the most recent raw market data snapshot used to compute a sentiment tick.
+    Returns the most recent pre-computed prediction tick for the given asset and timeframe. Data is generated every 15 minutes by the prediction cron pipeline.
 
-    Generated from OpenAPI endpoint: GET /api/v1/sentiment/debug/latest-markets
+    Generated from OpenAPI endpoint: GET /api/v1/prediction
 
     Args:
         context: MCP context (auto-injected by framework, not user-provided)
         asset: Crypto asset (optional)
+        timeframe: Prediction timeframe. Corresponds to Polymarket tag slugs. (optional)
 
     Returns:
         API response (dict, list, or other JSON type)
 
     Example Usage:
-        await get_latest_market_snapshot(asset="BTC")
+        await get_latest_prediction_tick(asset="BTC", timeframe="15M")
 
         Note: 'context' parameter is auto-injected by MCP framework
     """
@@ -414,9 +286,10 @@ async def get_latest_market_snapshot(
     api_key = get_active_api_key(context)
 
     try:
-        url = f"https://pma.d402.net/api/v1/sentiment/debug/latest-markets"
+        url = f"https://pma.d402.net/api/v1/prediction"
         params = {
-            "asset": asset
+            "asset": asset,
+            "timeframe": timeframe
         }
         params = {k: v for k, v in params.items() if v is not None}
         headers = {}
@@ -436,8 +309,8 @@ async def get_latest_market_snapshot(
         return response.json()
 
     except Exception as e:
-        logger.error(f"Error in get_latest_market_snapshot: {e}")
-        return {"error": str(e), "endpoint": "/api/v1/sentiment/debug/latest-markets"}
+        logger.error(f"Error in get_latest_prediction_tick: {e}")
+        return {"error": str(e), "endpoint": "/api/v1/prediction"}
 
 
 # TODO: Add your API-specific functions here

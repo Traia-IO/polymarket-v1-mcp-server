@@ -2,7 +2,7 @@
   "github_url": "https://github.com/Traia-IO/polymarket-v1-mcp-server",
   "mcp_server": {
     "name": "polymarket-v1-mcp",
-    "description": "Polymarket mcp v1",
+    "description": "Polymarket mcp server",
     "server_type": "streamable-http",
     "requires_api_key": true,
     "api_key_header": "Authorization",
@@ -10,11 +10,9 @@
       "POLYMARKET_V1_API_KEY"
     ],
     "capabilities": [
-      "health_check",
-      "api_status",
       "get_latest_sentiment_tick_or_rollup",
       "get_sentiment_history",
-      "get_latest_market_snapshot"
+      "get_latest_prediction_tick"
     ],
     "payment_protocol": "402",
     "dual_mode": true,
